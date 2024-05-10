@@ -1,6 +1,7 @@
 package com.martynov.spring;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,14 +16,19 @@ public class FileController {
 
     private final FileService fileService;
 
+    @Value("${secret}")
+    private String secret;
+
+
     @GetMapping("/{filename}")
     public ResponseEntity<Resource> getFile(@PathVariable String filename) {
         return fileService.getFile(filename);
     }
 
     @DeleteMapping("/{filename}")
-    public ResponseEntity<String> deleteFile(@PathVariable String filename) {
-        fileService.deleteFile(filename);
+    public ResponseEntity<String> deleteFile(@PathVariable String filename, @RequestBody String secretStr) {
+        if (secretStr.equals(secret))
+            fileService.deleteFile(filename);
         return ResponseEntity.ok("success");
     }
 
